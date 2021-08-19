@@ -15,7 +15,7 @@ export async function getNewsByTopicId(topicId: number, title: string): Promise<
 export async function getAllController(params: QueryString): Promise<NewsModel[]> {
   const query = NewsModel.query();
 
-  query.where('status', 'publish');
+  query.whereNotNull('title');
   query.orderBy('created_at');
 
   if (params.get_all) {
