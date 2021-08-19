@@ -27,6 +27,7 @@ const news: FastifyPluginAsync = async (fastify): Promise<void> => {
     const [err, news] = await fastify.to(getById(id));
     if (err) {
       fastify.log.error(err);
+      reply.internalServerError(err.message);
     }
     return news;
   });

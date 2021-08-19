@@ -5,9 +5,7 @@ import { BaseModel } from './base.model';
 // import { TopicModel } from './topic.model';
 
 export class TopicModel extends BaseModel {
-  title!: string;
-  body!: string;
-  status!: string;
+  topic_name!: string;
   created_at!: Date;
   updated_at!: Date;
 
