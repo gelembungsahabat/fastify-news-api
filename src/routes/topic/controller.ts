@@ -8,10 +8,7 @@ export async function getTopicName(topicName: string): Promise<TopicModel> {
 
 export async function getAllController(params: QueryString): Promise<TopicModel[]> {
   const query = TopicModel.query();
-
-  query.where('status', 'publish');
-  query.orderBy('created_at');
-
+  query.where('topic_name', null || !null);
   if (params.get_all) {
     return await query;
   } else {
