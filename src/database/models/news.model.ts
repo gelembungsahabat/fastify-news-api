@@ -8,9 +8,9 @@ export class NewsModel extends BaseModel {
   title!: string;
   body!: string;
   status!: string;
+  topic_id!: number;
   created_at!: Date;
   updated_at!: Date;
-  topic_id!: number;
 
   topic!: TopicModel;
 

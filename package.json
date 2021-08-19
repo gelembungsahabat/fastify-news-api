@@ -24,6 +24,7 @@
     "fastify-cli": "^2.13.0",
     "fastify-plugin": "^3.0.0",
     "fastify-sensible": "^3.1.0",
+    "fluent-json-schema": "^3.0.1",
     "knex": "^0.21.17",
     "objection": "^2.2.15",
     "pg": "^8.7.1"
@@ -31,10 +32,10 @@
   "devDependencies": {
     "@types/node": "^15.0.0",
     "@types/tap": "^15.0.0",
-    "concurrently": "^6.0.0",
-    "cross-env": "^7.0.3",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
+    "concurrently": "^6.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
