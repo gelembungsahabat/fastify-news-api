@@ -12,7 +12,8 @@
     "build:ts": "tsc",
     "dev": "tsc && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"tsc -w\" \"fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js\"",
     "db": "TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' knex --knexfile=./knexfile.ts",
-    "clean-build:api": "rimraf ./dist"
+    "clean-build:api": "rimraf ./dist",
+    "format": "npx prettier --write '**/*.ts'"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,8 @@
     "@types/tap": "^15.0.0",
     "concurrently": "^6.0.0",
     "cross-env": "^7.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",

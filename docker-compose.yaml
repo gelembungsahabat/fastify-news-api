@@ -10,9 +10,9 @@ services:
     command: >
       sh -c "yarn clean-build:api && yarn dev"
     expose: 
-      - "3051"
+      - "3000"
     ports:
-      - "3051:3051"
+      - "3000:3000"
     environment: 
       NODE_ENV: development
     depends_on: 

@@ -6,7 +6,7 @@ import { TableName } from '../tablename';
 export async function up(knex: Knex): Promise<any> {
   return knex.schema.createTable(TableName.TOPIC, (t) => {
     t.integer('id').notNullable().unique().primary();
-    t.text('topic').notNullable();
+    t.text('topic_name').notNullable().unique();
     t.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
     t.timestamp('updated_at', { useTz: true }).defaultTo(knex.fn.now());
   });
