@@ -5,15 +5,9 @@ import { QueryStringSchema } from '../../shared/schema';
 
 // const tags = ['Topic'];
 
-const TopicSchema = S.object()
-  .prop('topic_name', S.string().required())
-  .prop('status', S.string().required())
-  .prop('topic_id', S.number().required());
+const TopicSchema = S.object().prop('topic_name', S.string().required());
 
-const TopicSchemaUpdate = S.object()
-  .prop('topic_name', S.string().required())
-  .prop('status', S.string())
-  .prop('topic_id', S.number());
+const TopicSchemaUpdate = S.object().prop('topic_name', S.string());
 
 const TopicSchemaWithId = TopicSchema.prop('id', S.number().required());
 

@@ -8,7 +8,8 @@ export async function getTopicName(topicName: string): Promise<TopicModel> {
 
 export async function getAllController(params: QueryString): Promise<TopicModel[]> {
   const query = TopicModel.query();
-  query.where('topic_name', null || !null);
+  query.whereNotNull('topic_name');
+  query.orderBy('created_at');
   if (params.get_all) {
     return await query;
   } else {
