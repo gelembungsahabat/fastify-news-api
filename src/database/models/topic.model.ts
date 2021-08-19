@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+
 import { TableName } from '../tablename';
 import { BaseModel } from './base.model';
 // import { TopicModel } from './topic.model';

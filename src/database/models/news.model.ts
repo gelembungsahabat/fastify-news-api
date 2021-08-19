@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+
 import { TableName } from '../tablename';
 import { BaseModel } from './base.model';
 import { TopicModel } from './topic.model';
@@ -9,6 +10,9 @@ export class NewsModel extends BaseModel {
   status!: string;
   created_at!: Date;
   updated_at!: Date;
+  topic_id!: number;
+
+  topic!: TopicModel;
 
   static tableName = TableName.NEWS;
 
