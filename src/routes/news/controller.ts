@@ -2,11 +2,11 @@ import { NewsModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function getNewsByTopicId(topicName: string, title: string): Promise<NewsModel> {
+export async function getNewsByTopicId(topicName: string, body: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
       topic_name: topicName,
-      title: title
+      body: body
     })
     .first();
   return findNews;
@@ -14,7 +14,6 @@ export async function getNewsByTopicId(topicName: string, title: string): Promis
 
 export async function getAllController(params: QueryString): Promise<NewsModel[]> {
   const query = NewsModel.query();
-  query.where('status', 'draft' || 'publish');
   if (params.topic) {
     query.where('topic_name', params.topic);
   }
@@ -22,8 +21,9 @@ export async function getAllController(params: QueryString): Promise<NewsModel[]
     query.where('status', params.status);
     query.orderBy('created_at');
   }
-  if (!params.status) {
-    query.whereNotNull('title');
+  if (!params.status && !params.topic) {
+    query.where('status', 'draft');
+    query.orWhere('status', 'publish');
     query.orderBy('created_at');
   }
   if (params.get_all) {
@@ -41,7 +41,7 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 }
 
 export async function createNewsController(payload: NewsBodyCreate): Promise<NewsModel | null> {
-  const findNews = await getNewsByTopicId(payload.topic_name, payload.title);
+  const findNews = await getNewsByTopicId(payload.topic_name, payload.body);
   if (findNews) {
     return null;
   } else {
@@ -53,9 +53,9 @@ export async function updateNewsController(
   id: number,
   payload: NewsBodyUpdate
 ): Promise<NewsModel | null> {
-  if (payload.title) {
+  if (payload.body) {
     const find = await getByIdController(id);
-    const findNews = await getNewsByTopicId(payload.topic_name || find.topic_name, payload.title);
+    const findNews = await getNewsByTopicId(payload.topic_name || find.topic_name, payload.body);
     if (findNews) {
       return null;
     }
