@@ -15,9 +15,14 @@ export async function getNewsByTopicId(topicId: number, title: string): Promise<
 export async function getAllController(params: QueryString): Promise<NewsModel[]> {
   const query = NewsModel.query();
 
-  query.whereNotNull('title');
-  query.orderBy('created_at');
-
+  if (params.status) {
+    query.where('status', params.status);
+    query.orderBy('created_at');
+  }
+  if (!params.status) {
+    query.whereNotNull('title');
+    query.orderBy('created_at');
+  }
   if (params.get_all) {
     return await query;
   } else {
