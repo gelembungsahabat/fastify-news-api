@@ -14,7 +14,7 @@ export async function getNewsByTopicId(topicName: string, title: string): Promis
 
 export async function getAllController(params: QueryString): Promise<NewsModel[]> {
   const query = NewsModel.query();
-
+  query.where('status', 'draft' || 'publish');
   if (params.topic) {
     query.where('topic_name', params.topic);
   }
@@ -64,7 +64,5 @@ export async function updateNewsController(
 }
 
 export async function removeNewsController(id: number): Promise<number> {
-  const update = await NewsModel.query().deleteById(id);
-
-  return update;
+  return await NewsModel.query().where('id', id).patch({ status: 'deleted' });
 }
