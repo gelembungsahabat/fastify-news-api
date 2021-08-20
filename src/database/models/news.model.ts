@@ -8,7 +8,7 @@ export class NewsModel extends BaseModel {
   title!: string;
   body!: string;
   status!: string;
-  topic_id!: number;
+  topic_name!: string;
   created_at!: Date;
   updated_at!: Date;
 

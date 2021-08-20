@@ -9,13 +9,13 @@ const NewsSchema = S.object()
   .prop('title', S.string().required())
   .prop('body', S.string().required())
   .prop('status', S.string().required())
-  .prop('topic_id', S.number().required());
+  .prop('topic_name', S.string().required());
 
 const NewsSchemaUpdate = S.object()
   .prop('title', S.string())
   .prop('body', S.string())
   .prop('status', S.string())
-  .prop('topic_id', S.number());
+  .prop('topic_name', S.string());
 
 const NewsSchemaWithId = NewsSchema.prop('id', S.number().required());
 

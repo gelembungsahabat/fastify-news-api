@@ -2,10 +2,10 @@ import { NewsModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function getNewsByTopicId(topicId: number, title: string): Promise<NewsModel> {
+export async function getNewsByTopicId(topicName: string, title: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
-      topic_id: topicId,
+      topic_name: topicName,
       title: title
     })
     .first();
@@ -15,6 +15,9 @@ export async function getNewsByTopicId(topicId: number, title: string): Promise<
 export async function getAllController(params: QueryString): Promise<NewsModel[]> {
   const query = NewsModel.query();
 
+  if (params.topic) {
+    query.where('topic_name', params.topic);
+  }
   if (params.status) {
     query.where('status', params.status);
     query.orderBy('created_at');
@@ -38,7 +41,7 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 }
 
 export async function createNewsController(payload: NewsBodyCreate): Promise<NewsModel | null> {
-  const findNews = await getNewsByTopicId(payload.topic_id, payload.title);
+  const findNews = await getNewsByTopicId(payload.topic_name, payload.title);
   if (findNews) {
     return null;
   } else {
@@ -52,7 +55,7 @@ export async function updateNewsController(
 ): Promise<NewsModel | null> {
   if (payload.title) {
     const find = await getByIdController(id);
-    const findNews = await getNewsByTopicId(payload.topic_id || find.topic_id, payload.title);
+    const findNews = await getNewsByTopicId(payload.topic_name || find.topic_name, payload.title);
     if (findNews) {
       return null;
     }

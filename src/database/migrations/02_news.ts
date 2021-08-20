@@ -9,10 +9,10 @@ export async function up(knex: Knex): Promise<any> {
     t.text('title').notNullable();
     t.text('body').notNullable();
     t.text('status').notNullable();
-    t.integer('topic_id')
+    t.text('topic_name')
       .unsigned()
       .notNullable()
-      .references('id')
+      .references('topic_name')
       .inTable(TableName.TOPIC)
       .onDelete('CASCADE')
       .index();
