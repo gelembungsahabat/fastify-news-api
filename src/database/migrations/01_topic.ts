@@ -8,7 +8,7 @@ export async function up(knex: Knex): Promise<any> {
     t.integer('id').notNullable().unique().primary();
     t.text('topic_name').notNullable().unique();
     t.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
-    t.timestamp('updated_at', { useTz: true }).defaultTo(knex.fn.now());
+    t.timestamp('updated_at', { useTz: true });
   });
 }
 
