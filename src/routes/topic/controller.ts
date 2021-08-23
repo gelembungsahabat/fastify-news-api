@@ -43,7 +43,7 @@ export async function updateTopicController(
       return null;
     }
   }
-  return await TopicModel.query().patchAndFetchById(id, payload);
+  return await TopicModel.query().patchAndFetchById(id, { updated_at: new Date(), ...payload });
 }
 
 export async function removeTopicController(id: number): Promise<number> {

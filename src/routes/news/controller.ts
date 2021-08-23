@@ -60,7 +60,7 @@ export async function updateNewsController(
       return null;
     }
   }
-  return await NewsModel.query().patchAndFetchById(id, payload);
+  return await NewsModel.query().patchAndFetchById(id, { updated_at: new Date(), ...payload });
 }
 
 export async function removeNewsController(id: number): Promise<number> {
