@@ -9,15 +9,8 @@ export async function up(knex: Knex): Promise<any> {
     t.text('title').notNullable();
     t.text('body').notNullable();
     t.text('status').notNullable();
-    t.integer('topic_id')
-      .unsigned()
-      .notNullable()
-      .references('id')
-      .inTable(TableName.TOPIC)
-      .onDelete('CASCADE')
-      .index();
     t.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
-    t.timestamp('updated_at', { useTz: true }).defaultTo(knex.fn.now());
+    t.timestamp('updated_at', { useTz: true });
   });
 }
 

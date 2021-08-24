@@ -15,10 +15,14 @@ export class TopicModel extends BaseModel {
   static relationMappings = (): any => ({
     topic: {
       modelClass: TopicModel,
-      relation: Model.HasManyRelation,
+      relation: Model.ManyToManyRelation,
       join: {
         from: `${TableName.TOPIC}.id`,
-        to: `${TableName.NEWS}.topic_id`
+        through: {
+          from: `${TableName.NEWS_TOPIC}.topic_id`,
+          to: `${TableName.NEWS_TOPIC}.news_id`
+        },
+        to: `${TableName.NEWS}.id`
       }
     }
   });

@@ -22,3 +22,8 @@ export async function up(knex: Knex): Promise<any> {
       .index();
   });
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function down(knex: Knex): Promise<any> {
+  return knex.schema.dropTableIfExists(TableName.NEWS_TOPIC);
+}

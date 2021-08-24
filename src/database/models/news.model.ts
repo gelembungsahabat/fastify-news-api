@@ -8,7 +8,6 @@ export class NewsModel extends BaseModel {
   title!: string;
   body!: string;
   status!: string;
-  topic_name!: string;
   created_at!: Date;
   updated_at!: Date;
 
@@ -20,9 +19,13 @@ export class NewsModel extends BaseModel {
   static relationMappings = (): any => ({
     topic: {
       modelClass: TopicModel,
-      relation: Model.BelongsToOneRelation,
+      relation: Model.ManyToManyRelation,
       join: {
-        from: `${TableName.NEWS}.topic_id`,
+        from: `${TableName.NEWS}.id`,
+        through: {
+          from: `${TableName.NEWS_TOPIC}.news_id`,
+          to: `${TableName.NEWS_TOPIC}.topic_id`
+        },
         to: `${TableName.TOPIC}.id`
       }
     }

@@ -2,10 +2,9 @@ import { NewsModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function getNewsByTopicId(topicName: string, body: string): Promise<NewsModel> {
+export async function getNewsByTopicId(body: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
-      topic_name: topicName,
       body: body
     })
     .first();
@@ -41,7 +40,7 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 }
 
 export async function createNewsController(payload: NewsBodyCreate): Promise<NewsModel | null> {
-  const findNews = await getNewsByTopicId(payload.topic_name, payload.body);
+  const findNews = await getNewsByTopicId(payload.body);
   if (findNews) {
     return null;
   } else {
@@ -54,8 +53,8 @@ export async function updateNewsController(
   payload: NewsBodyUpdate
 ): Promise<NewsModel | null> {
   if (payload.body) {
-    const find = await getByIdController(id);
-    const findNews = await getNewsByTopicId(payload.topic_name || find.topic_name, payload.body);
+    // const find = await getByIdController(id);
+    const findNews = await getNewsByTopicId(payload.body);
     if (findNews) {
       return null;
     }
