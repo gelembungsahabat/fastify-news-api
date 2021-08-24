@@ -1,4 +1,4 @@
-import { NewsModel } from '../../database/models';
+import { NewsModel, NewsTopicModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
@@ -39,12 +39,25 @@ export async function getByIdController(id: number): Promise<NewsModel> {
   return await NewsModel.query().findById(id);
 }
 
-export async function createNewsController(payload: NewsBodyCreate): Promise<NewsModel | null> {
+export async function createNewsController(
+  payload: NewsBodyCreate
+): Promise<NewsModel | NewsTopicModel | null> {
   const findNews = await getNewsByTopicId(payload.body);
   if (findNews) {
     return null;
   } else {
-    return await NewsModel.query().insert(payload);
+    if (Array.isArray(payload.topic_id)) {
+      await NewsTopicModel.query().insert(
+        payload.topic_id.map((topicId) => {
+          return { topic_id: topicId };
+        })
+      );
+    }
+    return await NewsModel.query().insert({
+      title: payload.title,
+      body: payload.body,
+      status: payload.status
+    });
   }
 }
 

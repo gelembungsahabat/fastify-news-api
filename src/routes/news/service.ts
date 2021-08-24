@@ -1,4 +1,4 @@
-import { NewsModel } from '../../database/models';
+import { NewsModel, NewsTopicModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import {
   createNewsController,
@@ -9,7 +9,7 @@ import {
 } from './controller';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function create(payload: NewsBodyCreate): Promise<NewsModel | null> {
+export async function create(payload: NewsBodyCreate): Promise<NewsModel | NewsTopicModel | null> {
   return await createNewsController(payload);
 }
 
