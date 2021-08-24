@@ -2,6 +2,8 @@
 
 API for manage topic and news with fastify-ts
 
+> Disclaimer : This Repo is Still on Progress
+
 ## How To Use?
 
 install dependencies:
