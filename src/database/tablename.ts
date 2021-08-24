@@ -1,4 +1,5 @@
 export enum TableName {
   NEWS = 'news',
-  TOPIC = 'topic'
+  TOPIC = 'topic',
+  NEWS_TOPIC = 'news_topic'
 }
