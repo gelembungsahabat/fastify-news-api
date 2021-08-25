@@ -2,10 +2,10 @@ import { NewsModel, NewsTopicModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function getNewsByTopicId(body: string): Promise<NewsModel> {
+export async function getNewsByTopicId(title: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
-      body: body
+      title: title
     })
     .first();
   return findNews;
@@ -42,7 +42,7 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 export async function createNewsController(
   payload: NewsBodyCreate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
-  const findNews = await getNewsByTopicId(payload.body);
+  const findNews = await getNewsByTopicId(payload.title);
   if (findNews) {
     return null;
   } else {
