@@ -51,7 +51,7 @@ export async function createNewsController(
       body: payload.body,
       status: payload.status
     });
-    const newsId = await NewsModel.query().select('id').where('body', payload.body);
+    const newsId = await NewsModel.query().select('id').where('title', payload.title);
     await NewsTopicModel.query().insert(
       payload.topic_id.map((topicId) => {
         return { topic_id: topicId, news_id: newsId[0].id };
