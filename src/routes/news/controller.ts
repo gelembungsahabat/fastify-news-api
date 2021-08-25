@@ -19,12 +19,14 @@ export async function getAllController(params: QueryString): Promise<NewsModel[]
   }
   if (params.status) {
     query.where('status', params.status);
-    query.orderBy('created_at').withGraphFetched('topic');
+    if (params.status !== 'deleted') {
+      query.orderBy('created_at').withGraphFetched('topic').whereNot('status', 'deleted');
+    }
   }
   if (!params.status && !params.topic) {
     query.where('status', 'draft');
     query.orWhere('status', 'publish');
-    query.orderBy('created_at').withGraphFetched('topic');
+    query.orderBy('created_at').withGraphFetched('topic').whereNot('status', 'deleted');
   }
   if (params.get_all) {
     return await query;
