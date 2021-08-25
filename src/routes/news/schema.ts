@@ -17,7 +17,7 @@ const NewsSchemaUpdate = S.object()
   .prop('status', S.string())
   .prop('topic_id', S.array());
 
-const NewsSchemaWithId = NewsSchema.prop('id', S.number().required());
+const NewsSchemaWithId = NewsSchema.prop('id', S.number().required()).prop('topic', S.array());
 
 export const GetAllNewsSchema: RouteShorthandOptions = {
   schema: {

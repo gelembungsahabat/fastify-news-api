@@ -18,12 +18,12 @@ export async function getAllController(params: QueryString): Promise<NewsModel[]
   }
   if (params.status) {
     query.where('status', params.status);
-    query.orderBy('created_at');
+    query.orderBy('created_at').withGraphFetched('topic');
   }
   if (!params.status && !params.topic) {
     query.where('status', 'draft');
     query.orWhere('status', 'publish');
-    query.orderBy('created_at');
+    query.orderBy('created_at').withGraphFetched('topic');
   }
   if (params.get_all) {
     return await query;
@@ -36,7 +36,7 @@ export async function getAllController(params: QueryString): Promise<NewsModel[]
 }
 
 export async function getByIdController(id: number): Promise<NewsModel> {
-  return await NewsModel.query().findById(id);
+  return await NewsModel.query().findById(id).withGraphFetched('topic');
 }
 
 export async function createNewsController(
