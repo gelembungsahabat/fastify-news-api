@@ -3,8 +3,6 @@ import S from 'fluent-json-schema';
 
 import { QueryStringSchema } from '../../shared/schema';
 
-// const tags = ['news'];
-
 const NewsSchema = S.object()
   .prop('title', S.string().required())
   .prop('body', S.string().required())
@@ -19,11 +17,16 @@ const NewsSchemaUpdate = S.object()
 
 const NewsSchemaWithId = NewsSchema.prop('id', S.number().required()).prop('topic', S.array());
 
+const GetAllSchemaResponse = NewsSchemaUpdate.prop('id', S.number().required())
+  .prop('topic_name', S.string())
+  .prop('topic', S.array())
+  .prop('news', S.array());
+
 export const GetAllNewsSchema: RouteShorthandOptions = {
   schema: {
     querystring: QueryStringSchema,
     response: {
-      200: S.array().items(NewsSchemaWithId)
+      200: S.array().items(GetAllSchemaResponse)
     }
   }
 };

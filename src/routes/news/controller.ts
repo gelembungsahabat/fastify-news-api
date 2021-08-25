@@ -1,4 +1,4 @@
-import { NewsModel, NewsTopicModel } from '../../database/models';
+import { NewsModel, NewsTopicModel, TopicModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
@@ -11,10 +11,11 @@ export async function getNewsByTopicId(title: string): Promise<NewsModel> {
   return findNews;
 }
 
-export async function getAllController(params: QueryString): Promise<NewsModel[]> {
+export async function getAllController(params: QueryString): Promise<NewsModel[] | TopicModel[]> {
   const query = NewsModel.query();
+  const topicQuery = TopicModel.query();
   if (params.topic) {
-    query.where('topic_name', params.topic);
+    topicQuery.where('topic_name', params.topic).withGraphFetched('news');
   }
   if (params.status) {
     query.where('status', params.status);
@@ -30,7 +31,9 @@ export async function getAllController(params: QueryString): Promise<NewsModel[]
   } else {
     // objection page start at 0
     const page = Number(params.page) - 1 || 0;
-    const newsPaged = await query.page(page, params.size || 10);
+    const newsPaged = params.topic
+      ? await topicQuery.page(page, params.size || 10)
+      : await query.page(page, params.size || 10);
     return newsPaged.results;
   }
 }

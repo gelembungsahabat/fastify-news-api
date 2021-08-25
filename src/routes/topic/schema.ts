@@ -3,8 +3,6 @@ import S from 'fluent-json-schema';
 
 import { QueryStringSchema } from '../../shared/schema';
 
-// const tags = ['Topic'];
-
 const TopicSchema = S.object().prop('topic_name', S.string().required());
 
 const TopicSchemaUpdate = S.object().prop('topic_name', S.string());
