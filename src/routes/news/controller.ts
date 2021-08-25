@@ -41,23 +41,28 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 
 export async function createNewsController(
   payload: NewsBodyCreate
-): Promise<NewsModel | NewsTopicModel | null> {
+): Promise<NewsModel | NewsTopicModel[] | null> {
   const findNews = await getNewsByTopicId(payload.body);
   if (findNews) {
     return null;
   } else {
-    if (Array.isArray(payload.topic_id)) {
-      await NewsTopicModel.query().insert(
-        payload.topic_id.map((topicId) => {
-          return { topic_id: topicId };
-        })
-      );
-    }
-    return await NewsModel.query().insert({
+    await NewsModel.query().insert({
       title: payload.title,
       body: payload.body,
       status: payload.status
     });
+    const newsId = await NewsModel.query().select('id').where('body', payload.body);
+    await NewsTopicModel.query().insert(
+      payload.topic_id.map((topicId) => {
+        return { topic_id: topicId, news_id: newsId[0].id };
+      })
+    );
+    const response = await NewsModel.query().where({
+      title: payload.title,
+      body: payload.body,
+      status: payload.status
+    });
+    return await response[0];
   }
 }
 

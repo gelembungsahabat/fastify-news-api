@@ -8,12 +8,14 @@ import { QueryStringSchema } from '../../shared/schema';
 const NewsSchema = S.object()
   .prop('title', S.string().required())
   .prop('body', S.string().required())
-  .prop('status', S.string().required());
+  .prop('status', S.string().required())
+  .prop('topic_id', S.array());
 
 const NewsSchemaUpdate = S.object()
   .prop('title', S.string())
   .prop('body', S.string())
-  .prop('status', S.string());
+  .prop('status', S.string())
+  .prop('topic_id', S.array());
 
 const NewsSchemaWithId = NewsSchema.prop('id', S.number().required());
 
