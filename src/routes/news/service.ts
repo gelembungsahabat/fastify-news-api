@@ -15,7 +15,10 @@ export async function create(
   return await createNewsController(payload);
 }
 
-export async function update(id: number, payload: NewsBodyUpdate): Promise<NewsModel | null> {
+export async function update(
+  id: number,
+  payload: NewsBodyUpdate
+): Promise<NewsModel | NewsTopicModel[] | null> {
   return await updateNewsController(id, payload);
 }
 

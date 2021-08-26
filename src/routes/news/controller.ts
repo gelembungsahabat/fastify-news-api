@@ -74,15 +74,30 @@ export async function createNewsController(
 export async function updateNewsController(
   id: number,
   payload: NewsBodyUpdate
-): Promise<NewsModel | null> {
-  if (payload.body) {
-    // const find = await getByIdController(id);
-    const findNews = await getNewsByTopicId(payload.body);
+): Promise<NewsModel | NewsTopicModel[] | null> {
+  if (payload.title) {
+    const findNews = await getNewsByTopicId(payload.title);
     if (findNews) {
       return null;
     }
   }
-  return await NewsModel.query().patchAndFetchById(id, { updated_at: new Date(), ...payload });
+  if (Array.isArray(payload.topic_id)) {
+    await NewsTopicModel.query().delete().where('news_id', id);
+    await NewsTopicModel.query().insert(
+      payload.topic_id.map((topicId) => {
+        return {
+          news_id: id,
+          topic_id: topicId
+        };
+      })
+    );
+  }
+  return await NewsModel.query().patchAndFetchById(id, {
+    updated_at: new Date(),
+    title: payload.title,
+    body: payload.body,
+    status: payload.status
+  });
 }
 
 export async function removeNewsController(id: number): Promise<number> {
