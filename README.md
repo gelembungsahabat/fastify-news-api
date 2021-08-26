@@ -85,11 +85,13 @@ note:
 
 ### PUT request 
 (URL)
+- topic:
 ```
 http://localhost:3000/topic/{YOUR_TOPIC_ID}
+```
 
-or 
-
+- news:
+```
 http://localhost:3000/news/{YOUR_NEWS_ID}
 ```
 
