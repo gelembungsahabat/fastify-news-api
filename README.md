@@ -26,17 +26,17 @@ You can request API with `topic` and `news` endpoint
 ### GET request (url)
  - topic
 
-Get all topic from database
+Get all `topic` from database
 ```
 localhost:3000/topic
 ```
  - news
  
- Get all news from database
+ Get all `news` from database
 ```
 localhost:3000/news
 ```
-you can filter that news with adding `topic` or `status` querystring, like this :
+you can filter that `news` with adding `topic` or `status` querystring, like this :
 
 ```
 http://localhost:3000/news?topic={YOUR_TOPIC}
@@ -83,7 +83,18 @@ note:
 <br/>
 <br/>
 
-### PUT request (JSON body)
+### PUT request 
+(URL)
+```
+http://localhost:3000/topic/{YOUR_TOPIC_ID}
+
+or 
+
+http://localhost:3000/news/{YOUR_NEWS_ID}
+```
+
+
+(JSON body)
 - topic:
 ```
 {
