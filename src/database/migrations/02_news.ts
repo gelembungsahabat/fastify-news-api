@@ -8,7 +8,10 @@ export async function up(knex: Knex): Promise<any> {
     t.integer('id').notNullable().unique().primary();
     t.text('title').notNullable();
     t.text('body').notNullable();
-    t.text('status').notNullable();
+    t.enu('status', ['draft', 'publish', 'deleted'], {
+      useNative: true,
+      enumName: 'status'
+    }).notNullable();
     t.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
     t.timestamp('updated_at', { useTz: true });
   });
