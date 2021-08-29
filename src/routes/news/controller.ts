@@ -2,13 +2,18 @@ import { NewsModel, NewsTopicModel, TopicModel } from '../../database/models';
 import { QueryString } from '../../shared/interface';
 import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 
-export async function getNewsByTopicId(title: string): Promise<NewsModel> {
+export async function getNewsByTitle(title: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
       title: title
     })
     .first();
   return findNews;
+}
+
+export async function getTopicIdByName(name: string[]): Promise<TopicModel[]> {
+  const findTopic = await TopicModel.query().where({ topic_name: name });
+  return findTopic;
 }
 
 export async function getAllController(params: QueryString): Promise<NewsModel[] | TopicModel[]> {
@@ -47,7 +52,9 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 export async function createNewsController(
   payload: NewsBodyCreate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
-  const findNews = await getNewsByTopicId(payload.title);
+  // find news that already created
+  const findNews = await getNewsByTitle(payload.title);
+  const findTopic = await getTopicIdByName(payload.topics);
   if (findNews) {
     return null;
   } else {
@@ -56,12 +63,27 @@ export async function createNewsController(
       body: payload.body,
       status: payload.status
     });
-    const newsId = await NewsModel.query().select('id').where('title', payload.title);
-    await NewsTopicModel.query().insert(
-      payload.topic_id.map((topicId) => {
-        return { topic_id: topicId, news_id: newsId[0].id };
+    // find created topics
+    const findCreatedTopics = findTopic
+      .filter((topic) => payload.topics.includes(topic.topic_name))
+      .map((topicName) => topicName.topic_name);
+    // distinguish created topics with new topics
+    const findNewTopic = payload.topics.filter((topic) => !findCreatedTopics.includes(topic));
+    // create topics
+    await TopicModel.query().insert(
+      findNewTopic.map((topic) => {
+        return { topic_name: topic };
       })
     );
+    const newsId = await NewsModel.query().select('id').where('title', payload.title);
+    const topicId = await TopicModel.query().select('id').where('topic_name', payload.topics);
+    // create news_topic
+    await NewsTopicModel.query().insert(
+      topicId.map((topicId) => {
+        return { topic_id: topicId.id, news_id: newsId[0].id };
+      })
+    );
+    // create news
     const response = await NewsModel.query().where({
       title: payload.title,
       body: payload.body,
@@ -76,7 +98,7 @@ export async function updateNewsController(
   payload: NewsBodyUpdate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
   if (payload.title) {
-    const findNews = await getNewsByTopicId(payload.title);
+    const findNews = await getNewsByTitle(payload.title);
     if (findNews) {
       return null;
     }
