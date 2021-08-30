@@ -5,7 +5,7 @@ import { NewsBodyCreate, NewsBodyUpdate } from './interface';
 export async function getNewsByTitle(title: string): Promise<NewsModel> {
   const findNews = await NewsModel.query()
     .where({
-      title: title
+      title: title.toLowerCase()
     })
     .first();
   return findNews;
@@ -49,24 +49,26 @@ export async function createNewsController(
 ): Promise<NewsModel | NewsTopicModel[] | null> {
   const findNews = await getNewsByTitle(payload.title); // find news that already created
   const findTopic = await TopicModel.query().whereNotNull('topic_name').orderBy('created_at');
+  const PayloadTopics = payload.topics?.map((topic) => topic.toLowerCase());
+
   if (findNews) {
     return null;
   } else {
     try {
       const transactions = await NewsModel.transaction(async (trx) => {
         await NewsModel.query(trx).insert({
-          title: payload.title,
+          title: payload.title.toLowerCase(),
           body: payload.body,
           status: payload.status
         });
 
         // find created topics
         const findCreatedTopics = findTopic
-          .filter((topic) => payload.topics.includes(topic.topic_name))
+          .filter((topic) => PayloadTopics.includes(topic.topic_name))
           .map((topicName) => topicName.topic_name);
 
         // distinguish created topics with new topics
-        const findNewTopic = payload.topics.filter((topic) => !findCreatedTopics.includes(topic));
+        const findNewTopic = PayloadTopics.filter((topic) => !findCreatedTopics.includes(topic));
 
         // create topics
         await TopicModel.query(trx).insert(
@@ -74,8 +76,10 @@ export async function createNewsController(
             return { topic_name: topic };
           })
         );
-        const newsId = await NewsModel.query(trx).select('id').where('title', payload.title);
-        const topicId = payload.topics.map((topicName) =>
+        const newsId = await NewsModel.query(trx)
+          .select('id')
+          .where('title', payload.title.toLowerCase());
+        const topicId = PayloadTopics.map((topicName) =>
           TopicModel.query(trx).select('id').where('topic_name', topicName)
         );
 
@@ -92,7 +96,7 @@ export async function createNewsController(
     }
     // create news
     const response = await NewsModel.query().where({
-      title: payload.title,
+      title: payload.title.toLowerCase(),
       body: payload.body,
       status: payload.status
     });
@@ -105,39 +109,40 @@ export async function updateNewsController(
   payload: NewsBodyUpdate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
   const findTopic = await TopicModel.query().whereNotNull('topic_name').orderBy('created_at');
+  const PayloadTopics = payload.topics?.map((topic) => topic.toLowerCase());
   if (payload.title) {
     const findNews = await getNewsByTitle(payload.title);
     if (findNews) {
       return null;
     }
   }
-  if (Array.isArray(payload.topics)) {
+  if (Array.isArray(PayloadTopics)) {
     try {
       const transaction = NewsTopicModel.transaction(async (trx) => {
         // find created topics
-        const findCreatedTopics = payload.topics
+        const findCreatedTopics = PayloadTopics
           ? findTopic
-              .filter((topic) => payload.topics?.includes(topic.topic_name))
+              .filter((topic) => PayloadTopics?.includes(topic.topic_name))
               .map((topicName) => topicName.topic_name)
           : '';
 
         // distinguish created topics with new topics
-        const findNewTopic = payload.topics
-          ? payload.topics.filter((topic) => !findCreatedTopics.includes(topic))
+        const findNewTopic = PayloadTopics
+          ? PayloadTopics.filter((topic) => !findCreatedTopics.includes(topic.toLowerCase()))
           : [''];
 
         // create topics
         await TopicModel.query(trx).insert(
           findNewTopic.map((topic) => {
-            return { topic_name: topic };
+            return { topic_name: topic.toLowerCase() };
           })
         );
 
         // delete existing data in news_topic depends on news_id
         await NewsTopicModel.query(trx).delete().where('news_id', id);
-        const topicId = payload.topics
-          ? payload.topics.map((topicName) =>
-              TopicModel.query(trx).select('id').where('topic_name', topicName)
+        const topicId = PayloadTopics
+          ? PayloadTopics.map((topicName) =>
+              TopicModel.query(trx).select('id').where('topic_name', topicName.toLowerCase())
             )
           : [];
         // insert news_id and topic_id to NewsTopicModel
@@ -158,7 +163,7 @@ export async function updateNewsController(
   // edit news in NewsModel
   return await NewsModel.query().patchAndFetchById(id, {
     updated_at: new Date(),
-    title: payload.title,
+    title: payload.title?.toLowerCase(),
     body: payload.body,
     status: payload.status
   });

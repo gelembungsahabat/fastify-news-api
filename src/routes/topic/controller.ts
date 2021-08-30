@@ -3,7 +3,7 @@ import { QueryString } from '../../shared/interface';
 import { TopicBodyCreate, TopicBodyUpdate } from './interface';
 
 export async function getTopicName(topicName: string): Promise<TopicModel> {
-  return await TopicModel.query().where('topic_name', topicName).first();
+  return await TopicModel.query().where('topic_name', topicName.toLowerCase()).first();
 }
 
 export async function getAllController(params: QueryString): Promise<TopicModel[]> {
@@ -29,7 +29,9 @@ export async function createTopicController(payload: TopicBodyCreate): Promise<T
   if (findTopic) {
     return null;
   } else {
-    return await TopicModel.query().insert(payload);
+    return await TopicModel.query().insert({
+      topic_name: payload.topic_name.toLowerCase()
+    });
   }
 }
 
@@ -43,7 +45,10 @@ export async function updateTopicController(
       return null;
     }
   }
-  return await TopicModel.query().patchAndFetchById(id, { updated_at: new Date(), ...payload });
+  return await TopicModel.query().patchAndFetchById(id, {
+    updated_at: new Date(),
+    topic_name: payload.topic_name?.toLowerCase()
+  });
 }
 
 export async function removeTopicController(id: number): Promise<number> {
