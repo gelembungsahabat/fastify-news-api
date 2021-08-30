@@ -7,7 +7,7 @@ import { TopicModel } from './topic.model';
 export class NewsModel extends BaseModel {
   title!: string;
   body!: string;
-  status!: string;
+  status!: 'draft' | 'publish' | 'deleted';
   created_at!: Date;
   updated_at!: Date;
 

@@ -11,11 +11,6 @@ export async function getNewsByTitle(title: string): Promise<NewsModel> {
   return findNews;
 }
 
-export async function getTopicIdByName(name: string[]): Promise<TopicModel[]> {
-  const findTopic = await TopicModel.query().where({ topic_name: name });
-  return findTopic;
-}
-
 export async function getAllController(params: QueryString): Promise<NewsModel[] | TopicModel[]> {
   const query = NewsModel.query();
   const topicQuery = TopicModel.query();
@@ -54,7 +49,7 @@ export async function createNewsController(
 ): Promise<NewsModel | NewsTopicModel[] | null> {
   // find news that already created
   const findNews = await getNewsByTitle(payload.title);
-  const findTopic = await getTopicIdByName(payload.topics);
+  const findTopic = await TopicModel.query().whereNotNull('topic_name').orderBy('created_at');
   if (findNews) {
     return null;
   } else {
@@ -76,11 +71,13 @@ export async function createNewsController(
       })
     );
     const newsId = await NewsModel.query().select('id').where('title', payload.title);
-    const topicId = await TopicModel.query().select('id').where('topic_name', payload.topics);
+    const topicId = payload.topics.map((topicName) =>
+      TopicModel.query().select('id').where('topic_name', topicName)
+    );
     // create news_topic
     await NewsTopicModel.query().insert(
       topicId.map((topicId) => {
-        return { topic_id: topicId.id, news_id: newsId[0].id };
+        return { topic_id: topicId, news_id: newsId[0].id };
       })
     );
     // create news
@@ -103,13 +100,14 @@ export async function updateNewsController(
       return null;
     }
   }
-  if (Array.isArray(payload.topic_id)) {
+  if (Array.isArray(payload.topics)) {
     await NewsTopicModel.query().delete().where('news_id', id);
+    const topicId = await TopicModel.query().select('id').where('topic_name', payload.topics);
     await NewsTopicModel.query().insert(
-      payload.topic_id.map((topicId) => {
+      topicId.map((topicId) => {
         return {
           news_id: id,
-          topic_id: topicId
+          topic_id: topicId.id
         };
       })
     );

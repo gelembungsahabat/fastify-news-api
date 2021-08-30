@@ -19,5 +19,5 @@ export async function up(knex: Knex): Promise<any> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema.dropTableIfExists(TableName.NEWS);
+  return knex.schema.dropTableIfExists(TableName.NEWS).raw(`DROP TYPE status;`);
 }
