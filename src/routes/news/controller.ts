@@ -104,6 +104,7 @@ export async function updateNewsController(
   id: number,
   payload: NewsBodyUpdate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
+  const findTopic = await TopicModel.query().whereNotNull('topic_name').orderBy('created_at');
   if (payload.title) {
     const findNews = await getNewsByTitle(payload.title);
     if (findNews) {
@@ -111,17 +112,50 @@ export async function updateNewsController(
     }
   }
   if (Array.isArray(payload.topics)) {
-    await NewsTopicModel.query().delete().where('news_id', id);
-    const topicId = await TopicModel.query().select('id').where('topic_name', payload.topics);
-    await NewsTopicModel.query().insert(
-      topicId.map((topicId) => {
-        return {
-          news_id: id,
-          topic_id: topicId.id
-        };
-      })
-    );
+    try {
+      const transaction = NewsTopicModel.transaction(async (trx) => {
+        // find created topics
+        const findCreatedTopics = payload.topics
+          ? findTopic
+              .filter((topic) => payload.topics?.includes(topic.topic_name))
+              .map((topicName) => topicName.topic_name)
+          : '';
+
+        // distinguish created topics with new topics
+        const findNewTopic = payload.topics
+          ? payload.topics.filter((topic) => !findCreatedTopics.includes(topic))
+          : [''];
+
+        // create topics
+        await TopicModel.query(trx).insert(
+          findNewTopic.map((topic) => {
+            return { topic_name: topic };
+          })
+        );
+
+        // delete existing data in news_topic depends on news_id
+        await NewsTopicModel.query(trx).delete().where('news_id', id);
+        const topicId = payload.topics
+          ? payload.topics.map((topicName) =>
+              TopicModel.query(trx).select('id').where('topic_name', topicName)
+            )
+          : [];
+        // insert news_id and topic_id to NewsTopicModel
+        await NewsTopicModel.query(trx).insert(
+          topicId.map((topicId) => {
+            return {
+              news_id: id,
+              topic_id: topicId
+            };
+          })
+        );
+      });
+      transaction;
+    } catch (err) {
+      console.error(err);
+    }
   }
+  // edit news in NewsModel
   return await NewsModel.query().patchAndFetchById(id, {
     updated_at: new Date(),
     title: payload.title,
