@@ -47,39 +47,49 @@ export async function getByIdController(id: number): Promise<NewsModel> {
 export async function createNewsController(
   payload: NewsBodyCreate
 ): Promise<NewsModel | NewsTopicModel[] | null> {
-  // find news that already created
-  const findNews = await getNewsByTitle(payload.title);
+  const findNews = await getNewsByTitle(payload.title); // find news that already created
   const findTopic = await TopicModel.query().whereNotNull('topic_name').orderBy('created_at');
   if (findNews) {
     return null;
   } else {
-    await NewsModel.query().insert({
-      title: payload.title,
-      body: payload.body,
-      status: payload.status
-    });
-    // find created topics
-    const findCreatedTopics = findTopic
-      .filter((topic) => payload.topics.includes(topic.topic_name))
-      .map((topicName) => topicName.topic_name);
-    // distinguish created topics with new topics
-    const findNewTopic = payload.topics.filter((topic) => !findCreatedTopics.includes(topic));
-    // create topics
-    await TopicModel.query().insert(
-      findNewTopic.map((topic) => {
-        return { topic_name: topic };
-      })
-    );
-    const newsId = await NewsModel.query().select('id').where('title', payload.title);
-    const topicId = payload.topics.map((topicName) =>
-      TopicModel.query().select('id').where('topic_name', topicName)
-    );
-    // create news_topic
-    await NewsTopicModel.query().insert(
-      topicId.map((topicId) => {
-        return { topic_id: topicId, news_id: newsId[0].id };
-      })
-    );
+    try {
+      const transactions = await NewsModel.transaction(async (trx) => {
+        await NewsModel.query(trx).insert({
+          title: payload.title,
+          body: payload.body,
+          status: payload.status
+        });
+
+        // find created topics
+        const findCreatedTopics = findTopic
+          .filter((topic) => payload.topics.includes(topic.topic_name))
+          .map((topicName) => topicName.topic_name);
+
+        // distinguish created topics with new topics
+        const findNewTopic = payload.topics.filter((topic) => !findCreatedTopics.includes(topic));
+
+        // create topics
+        await TopicModel.query(trx).insert(
+          findNewTopic.map((topic) => {
+            return { topic_name: topic };
+          })
+        );
+        const newsId = await NewsModel.query(trx).select('id').where('title', payload.title);
+        const topicId = payload.topics.map((topicName) =>
+          TopicModel.query(trx).select('id').where('topic_name', topicName)
+        );
+
+        // create news_topic
+        await NewsTopicModel.query(trx).insert(
+          topicId.map((topicId) => {
+            return { topic_id: topicId, news_id: newsId[0].id };
+          })
+        );
+      });
+      transactions;
+    } catch (err) {
+      console.error(err);
+    }
     // create news
     const response = await NewsModel.query().where({
       title: payload.title,
